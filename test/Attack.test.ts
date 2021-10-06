@@ -26,14 +26,16 @@ describe("Attack", function () {
     // PROVE THAT PROXY CAN COMMUNICATE WITH IMPLEMENTATION
     let tx = await attack.validateItIsBroken();
     let isItBroken = await tx.wait();
-    
+
     // Expect the implementation address to return true on "Address.isContract()"
     let eventsEmitted = isItBroken.events ? isItBroken.events : [];
     expect(eventsEmitted[0].args?.result).to.true;
 
     // Run the attack
-    tx = await attack.destroy();
+    tx = await attack.connect(attacker).destroy();
     let receipt = await tx.wait();
+    expect(receipt.status).to.true;
+    // --------
 
     tx = await attack.validateItIsBroken();
     isItBroken = await tx.wait()
