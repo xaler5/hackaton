@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 
 describe("Motorbike", function () {
-  it("Should return the new Engine once it's deployed", async function () {
+  it("Should return the new Motorbike once it's deployed", async function () {
     const Engine = await ethers.getContractFactory("Engine");
     const engine = await Engine.deploy();
     await engine.deployed();

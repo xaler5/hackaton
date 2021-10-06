@@ -11,6 +11,7 @@ contract Attack {
 
     // Address of current implementation (The Engine)
     address public implementation;
+    event Check(bool result);
 
     constructor(address impl) public {
         implementation = impl;
@@ -31,6 +32,10 @@ contract Attack {
             abi.encodeWithSignature("initialize()")
            )
         );
+    }
+
+    function validateItIsBroken() external {
+        emit Check(Address.isContract(implementation));
     }
     
 }
